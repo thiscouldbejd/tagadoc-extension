@@ -1,6 +1,8 @@
 /* <!-- Set Up Event Handlers --> */
 chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
     
+    var _refresh = () => chrome.tabs.query({url: "*://docs.google.com/*"}, tabs => tabs.forEach(tab => chrome.tabs.sendMessage(tab.id, {"action": "refresh"})));
+    
     if (request.action == "get-tags") {
         
         if (request.doc) {
@@ -18,10 +20,19 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
                     authenticated: true,
                     file: file
                 }))
-                .catch(e => sendResponse({
-                    authenticated: false,
-                    error: e
-                }));
+                .catch(e => {
+                    if (e.status && e.status == 404) {
+                        setTimeout(_refresh, 20000);
+                        sendResponse({
+                            authenticated: true
+                        });
+                    } else {
+                        sendResponse({
+                            authenticated: false,
+                            error: e
+                        });
+                    }
+                });
     
             return true;
             
@@ -33,7 +44,7 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
         
     } else if (request.action == "auth-changed") {
         
-        chrome.tabs.query({url: "*://docs.google.com/*"}, tabs => tabs.forEach(tab => chrome.tabs.sendMessage(tab.id, {"action": "refresh"})));
+        _refresh();
         
     }
 

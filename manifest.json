@@ -3,8 +3,8 @@
   "minimum_chrome_version": "45",
   "name": "Tag-a-Doc",
   "short_name": "TagaDoc",
-  "description": "This extension displays document tags / properties for G-Suite / Google Apps",
-  "version": "1.0.3",
+  "description": "Easily keep track of projects, review dates, confidentiality levels or any other custom metadata. This extension displays document tags in G-Suite / Google Apps",
+  "version": "1.0.4",
   "icons": {
     "16": "icon16.png",
     "48": "icon48.png",

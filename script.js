@@ -70,7 +70,7 @@ var _start = () => {
 
             if (response.authenticated) {
                 
-                if (response.file.properties) Object.keys(response.file.properties).forEach(key => _addTag(_container, key, response.file.properties[key]));
+                if (response.file && response.file.properties) Object.keys(response.file.properties).forEach(key => _addTag(_container, key, response.file.properties[key]));
                 
             } else if (_container) {
                 
