@@ -3,8 +3,8 @@
   "minimum_chrome_version": "45",
   "name": "Tag-a-Doc",
   "short_name": "TagaDoc",
-  "description": "Easily keep track of projects, review dates, confidentiality levels or any other custom metadata. This extension displays document tags in G-Suite / Google Apps",
-  "version": "1.0.4",
+  "description": "Easily keep track of projects, review dates, confidentiality levels or custom metadata. This displays document tags in G-Suite Apps",
+  "version": "1.0.6",
   "icons": {
     "16": "icon16.png",
     "48": "icon48.png",
@@ -13,14 +13,15 @@
   "oauth2": {
     "client_id": "840861035525-2i3gkqc7ridmotb39vtba1mib3ja7cgo.apps.googleusercontent.com",
     "scopes": [
-      "email", "profile", "https://www.googleapis.com/auth/drive.readonly"
+      "email", "profile", "https://www.googleapis.com/auth/drive.readonly", "https://www.googleapis.com/auth/calendar.readonly"
     ]
   },
-  "permissions": ["identity", "tabs", "https://docs.google.com/*", "https://www.googleapis.com/*"],
+  "permissions": ["identity", "tabs", "https://docs.google.com/*", "https://calendar.google.com/*", "https://www.googleapis.com/*"],
   "content_scripts": [
       {
     "matches": [
-      "*://docs.google.com/*"
+      "*://docs.google.com/*",
+      "*://calendar.google.com/*"
     ],
     "js": [
       "script.js"
