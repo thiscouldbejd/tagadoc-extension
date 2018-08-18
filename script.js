@@ -1,6 +1,7 @@
 /* === Internal Constants === */
-const _style = "user-select: none;margin-left: .25rem !important; margin-right: .25rem !important; display: inline-block; padding: .25em .4em; font-size: 75%; font-weight: 700; line-height: 1;text-align: center; white-space: nowrap; vertical-align: baseline; border-radius: .25rem;";
-const _holder = "position: fixed; margin-left: 10px; margin-top: 10px; max-width: 280px";
+const _style = "user-select: none; margin-left: .25rem !important; margin-right: .25rem !important; display: inline-block; padding: .25em .4em; font-size: 75%; font-weight: 700; line-height: 1;text-align: center; white-space: nowrap; vertical-align: baseline; border-radius: .25rem;";
+const _stacked = "margin-bottom: .25rem;";
+const _holder = "position: absolute; margin-left: 5px; margin-top: 10px; max-width: 280px";
 const _class = "tagadoc";
 
 const _getColour = (value) => {
@@ -45,12 +46,12 @@ const _isCal = url => !!url.match(/:\/\/calendar.google.com/);
 const _isDoc = url => !!url.match(/:\/\/docs.google.com/);
 const _getId = url => url.match(/[-\w]{25,}/);
 
-const _addTag = (container, name, value, css_class) => {
+const _addTag = (container, name, value, css_class, css_style) => {
   if (container) {
     var tag = document.createElement("div"),
       attributes = {
-        "class": `${_class} ${css_class}`,
-        "style": `${_style} ${_getColour((name == "Review" || name == "Reviewed" || name == "Highlight") ? name : value)}`,
+        "class": `${_class}${css_class ? ` ${css_class}` : ""}`,
+        "style": `${_style}${css_style ? ` ${css_style}` : ""} ${_getColour((name == "Review" || name == "Reviewed" || name == "Highlight") ? name : value)}`,
         "aria-hidden": "false",
         "aria-disabled": "false"
       };
@@ -136,8 +137,7 @@ var _cal = (c_id, e_id, container) => chrome.runtime.sendMessage({
       Object.keys(attributes).forEach(key => _container.setAttribute(key, attributes[key]));
     	container.appendChild(_container);
       
-      Object.keys(response.data.extendedProperties.shared).forEach(key => _addTag(_container, key, response.data.extendedProperties.shared[key]));
-      
+      Object.keys(response.data.extendedProperties.shared).forEach(key => _addTag(_container, key, response.data.extendedProperties.shared[key], false, _stacked));
       
     }
       
@@ -161,31 +161,23 @@ var _start = () => {
     
     if (_observer) _observer.disconnect();
 		var _config = {attributes: false, childList: true, subtree: true},
-        _handle = mutants => {
-          for (var mutation of mutants) {
-              if (mutation.type == "childList") {
-                if (mutation.addedNodes && mutation.addedNodes.length > 0) {
-                  for (var node of mutation.addedNodes) {
-                    if (node && node.querySelectorAll) {
-                      var _candidates = node.getAttribute("jslog") ? [node] : node.querySelectorAll("[jslog]");
-                      if (_candidates && _candidates.length > 0) {
-                        for (var candidate of _candidates) {
-													var _values = candidate.getAttribute("jslog").split("; ");
-                          if (_values && _values.length == 3) {
-                            var _value = _values[1].substring( _values[1].indexOf(":") + 1),
-                                _event = _value.substring(0,  _value.indexOf(",")),
-                                _calendar = _value.substring( _value.indexOf(",") + 1);
-                          	if (_event && _calendar) _cal(_calendar, _event, candidate.closest("div[role='dialog']"));
-                          }
-                        }
-                      }
-                    }
-                	}
-                }
-              }
-          }
-        };
-    
+        _handle = mutants => mutants.forEach(m => {
+          if (m.type == "childList" && m.addedNodes) m.addedNodes.forEach(node => {
+            if (node && node.querySelectorAll) {
+              var _candidates = node.getAttribute("jslog") ? [node] : node.querySelectorAll("[jslog]");
+              if (_candidates) _candidates.forEach(candidate => {
+                var _values = candidate.getAttribute("jslog").split("; ");
+                  if (_values && _values.length == 3) {
+                    var _value = _values[1].substring( _values[1].indexOf(":") + 1),
+                        _event = _value.substring(0,  _value.indexOf(",")),
+                        _calendar = _value.substring( _value.indexOf(",") + 1);
+                    if (_event && _calendar) _cal(_calendar, _event, candidate.closest("div[role='dialog']"));
+                  }
+              });
+            }
+          })
+        });
+
 		_observer = new MutationObserver(_handle);
 		_observer.observe(document.body, _config);
     
