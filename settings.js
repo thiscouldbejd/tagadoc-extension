@@ -32,6 +32,16 @@ $(function() {
     "action": "auth-changed"
   });
 
+  var _signOut = interactive => _network.token.get(interactive ? interactive : false)
+    .then(_network.token.revoke)
+    .then(() => _reconcile(false, {
+      message: "Signed Out"
+    }))
+    .then(() => window.setTimeout(_notify, 10000))
+    .catch(error => _reconcile(true, {
+      error: error
+    }));
+
   /* <!-- Set Up Event Handlers --> */
   $("#btn_signIn").on("click.signin", e => {
     _log("Signing In");
@@ -52,15 +62,7 @@ $(function() {
   $("#btn_signOut").on("click.signout", e => {
     _log("Signing Out");
     _busy(e.target, true);
-    _network.token.get(false)
-      .then(_network.token.revoke)
-      .then(() => _reconcile(false, {
-        message: "Signed Out"
-      }))
-      .then(() => window.setTimeout(_notify, 10000))
-      .catch(error => _reconcile(true, {
-        error: error
-      })).then(() => _busy(e.target, false));
+    _signOut().then(() => _busy(e.target, false));
   });
 
   _network.token.get(false)
@@ -68,8 +70,10 @@ $(function() {
       message: `Already signed in with Token: ${token}`,
       value: token
     }))
-    .then(_getUser).then(_handleUser).catch(error => _reconcile(false, {
-      error: error
-    }));
+    .then(_getUser).then(_handleUser).catch(e => {
+      e.message == "OAuth2 not granted or revoked." ? _signOut(true) : _reconcile(false, {
+        error: e
+      });
+    });
 
 });

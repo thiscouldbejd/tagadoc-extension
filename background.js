@@ -1,3 +1,7 @@
+/* <!-- Internal Constants --> */
+const _isFolders = url => !!url.match(/:\/\/(.+.educ|educ).io\/folders/);
+const _isEvents = url => !!url.match(/:\/\/(.+.educ|educ).io\/events/);
+
 /* <!-- Internal Functions --> */
 var _refresh = () => chrome.tabs.query({
   url: ["*://docs.google.com/*", "*://calendar.google.com/*"]
@@ -37,7 +41,7 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
   if (request.action == "get-doc-tags") {
 
     return request.doc ? _callAPI(sendResponse, `https://www.googleapis.com/drive/v3/files/${request.doc}`, {
-      fields: "kind,id,name,mimeType,parents,properties,teamDriveId",
+      fields: "kind,id,name,mimeType,parents,properties,teamDriveId,capabilities(canEdit)",
       includeTeamDriveItems: true,
       supportsTeamDrives: true,
       corpora: "user,allTeamDrives"
@@ -49,10 +53,31 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
       alwaysIncludeEmail: false
     }) : false;
 
+  } else if (request.action == "request-auth") {
+
+    network().token.get(true)
+      .then(() => _refresh())
+      .then(() => true)
+      .catch(() => false)
+      .then(result => sendResponse({
+        authenticated: result
+      }));
+
   } else if (request.action == "auth-changed") {
+
+    _refresh();
+
+  } else if (request.action == "tags-updated") {
 
     _refresh();
 
   }
 
+});
+
+/* <!-- Set Up External Event Handlers (Messaging from Web-Apps) --> */
+chrome.runtime.onMessageExternal.addListener((request, sender) => {
+  if (sender.url && (_isFolders(sender.url) || _isEvents(sender.url))) {
+    if (request.action == "update") _refresh();
+  }
 });

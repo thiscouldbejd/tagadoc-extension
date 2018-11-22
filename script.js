@@ -5,48 +5,48 @@ const _style = "user-select: none; margin-left: .25rem !important; margin-right:
   _icon = "text-decoration: none; fill: #fff;",
   _holder = "z-index: 9999; pointer-events: all; position: absolute; margin-left: 5px; margin-top: 10px; max-width: 280px",
   _class = "tagadoc",
-  _unauth = "<svg fill='#901515' height='18' viewBox='0 0 24 24' width='24' xmlns='http://www.w3.org/2000/svg'><path d='M0 0h24v24H0V0z' fill='none'/><path d='M11 15h2v2h-2zm0-8h2v6h-2zm.99-5C6.47 2 2 6.48 2 12s4.47 10 9.99 10C17.52 22 22 17.52 22 12S17.52 2 11.99 2zM12 20c-4.42 0-8-3.58-8-8s3.58-8 8-8 8 3.58 8 8-3.58 8-8 8z'/></svg>",
+  _warn = "<svg fill='#901515' height='18' viewBox='0 0 28 24' width='24' xmlns='http://www.w3.org/2000/svg'><path d='M0 0h24v24H0V0z' fill='none'/><path d='M11 15h2v2h-2zm0-8h2v6h-2zm.99-5C6.47 2 2 6.48 2 12s4.47 10 9.99 10C17.52 22 22 17.52 22 12S17.52 2 11.99 2zM12 20c-4.42 0-8-3.58-8-8s3.58-8 8-8 8 3.58 8 8-3.58 8-8 8z'/></svg>",
   _host = "educ.io";
 
-const _edit = (size) => `<svg xmlns='http://www.w3.org/2000/svg' width='${size ? size : 12}' height='${size ? size : 12}' viewBox='0 0 24 24'><path d='M3 17.25V21h3.75L17.81 9.94l-3.75-3.75L3 17.25zM20.71 7.04c.39-.39.39-1.02 0-1.41l-2.34-2.34c-.39-.39-1.02-.39-1.41 0l-1.83 1.83 3.75 3.75 1.83-1.83z'/><path d='M0 0h24v24H0z' fill='none'/></svg>`;
+const _edit = size => `<svg xmlns='http://www.w3.org/2000/svg' width='${size ? size : 12}' height='${size ? size : 12}' viewBox='0 0 24 24'><path d='M3 17.25V21h3.75L17.81 9.94l-3.75-3.75L3 17.25zM20.71 7.04c.39-.39.39-1.02 0-1.41l-2.34-2.34c-.39-.39-1.02-.39-1.41 0l-1.83 1.83 3.75 3.75 1.83-1.83z'/><path d='M0 0h24v24H0z' fill='none'/></svg>`;
 const _getColour = value => {
   var colour, background;
   switch (value) {
-  case "High":
-    colour = "fff";
-    background = "dc3545";
-    break;
-  case "Medium":
-    colour = "212529";
-    background = "ffc107";
-    break;
-  case "Low":
-    colour = "fff";
-    background = "28a745";
-    break;
-  case "None":
-    colour = "fff";
-    background = "17a2b8";
-    break;
-  case "Review":
-    colour = "fff";
-    background = "343a40";
-    break;
-  case "Reviewed":
-    colour = "212529";
-    background = "f8f9fa";
-    break;
-  case "Highlight":
-    colour = "000";
-    background = "ffff00";
-    break;
-  case "Tag":
-    colour = "fff";
-    background = "000";
-    break;
-  default:
-    colour = "fff";
-    background = "6c757d";
+    case "High":
+      colour = "fff";
+      background = "dc3545";
+      break;
+    case "Medium":
+      colour = "212529";
+      background = "ffc107";
+      break;
+    case "Low":
+      colour = "fff";
+      background = "28a745";
+      break;
+    case "None":
+      colour = "fff";
+      background = "17a2b8";
+      break;
+    case "Review":
+      colour = "fff";
+      background = "343a40";
+      break;
+    case "Reviewed":
+      colour = "212529";
+      background = "f8f9fa";
+      break;
+    case "Highlight":
+      colour = "000";
+      background = "ffff00";
+      break;
+    case "Tag":
+      colour = "fff";
+      background = "000";
+      break;
+    default:
+      colour = "fff";
+      background = "6c757d";
   }
   return `color: #${colour}; background-color: #${background};`;
 };
@@ -94,15 +94,27 @@ var _clean = (container, css_class) => {
 
 var _needsAuth = container => {
 
+  /* === Click to Auth Handler === */
+  var click = document.createElement("a");
+  click.setAttribute("href", "#");
+  click.innerHTML = _warn;
+  click.addEventListener("click", e => {
+    e.preventDefault();
+    chrome.runtime.sendMessage({
+      "action": "request-auth"
+    });
+  }, true);
+
+
   /* === Not Logged In === */
   var warning = document.createElement("div"),
     attributes = _createAttributes(
       "tagadoc docs-icon goog-inline-block",
-      false, "Please sign in to TagaDoc to view tags!"
+      false, "To view tags, click to sign in to TagaDoc!"
     );
 
   Object.keys(attributes).forEach(key => warning.setAttribute(key, attributes[key]));
-  warning.innerHTML = _unauth;
+  warning.appendChild(click);
   container.appendChild(warning);
 
 };
@@ -122,10 +134,12 @@ var _doc = id => chrome.runtime.sendMessage({
     if (response.data) {
 
       if (response.data.parents && response.data.parents.length > 0) {
-        var _team = (response.data.teamDriveId && response.data.parents[0] == response.data.teamDriveId) ? "team." : "",
-          _suffix = (response.data.teamDriveId && response.data.parents[0] != response.data.teamDriveId) ? `.${response.data.teamDriveId}` : "",
-          _url = `https://${_host}/folders/#google,load.${_team}${response.data.parents[0]}${_suffix}.filter.${response.data.id}`;
-        _addTag(_container, "Tag", true, "goog-inline-block", `${_line} ${_icon}`, _url, "Edit Tags in Folders Web App").innerHTML += `<i style="padding-left: 1px;">${_edit()}</i>`;
+        if (response.data.capabilities && response.data.capabilities.canEdit === true) {
+          var _team = (response.data.teamDriveId && response.data.parents[0] == response.data.teamDriveId) ? "team." : "",
+            _suffix = (response.data.teamDriveId && response.data.parents[0] != response.data.teamDriveId) ? `.${response.data.teamDriveId}` : "",
+            _url = `https://${_host}/folders/#google,load.${_team}${response.data.parents[0]}${_suffix}.filter.${response.data.id}`;
+          _addTag(_container, "Tag", true, "goog-inline-block", `${_line} ${_icon}`, _url, "Edit Tags in Folders Web App").innerHTML += `<i style="padding-left: 1px;">${_edit()}</i>`;
+        }
       }
       if (response.data.properties) Object.keys(response.data.properties).forEach(key => _addTag(_container, key, response.data.properties[key], "goog-inline-block", _line));
 
@@ -160,7 +174,7 @@ var _cal = (c_id, e_id, container) => chrome.runtime.sendMessage({
 
       if (_data.extendedProperties && _data.extendedProperties.shared) Object.keys(_data.extendedProperties.shared).forEach((k) => _addTag(_container, k, _data.extendedProperties.shared[k], false, _stacked));
 
-      var _url = `https://${_host}/events/#google,calendar.item.${_encodeValue(encodeURIComponent(c_id))}.${_encodeValue(encodeURIComponent(e_id))}`;
+      var _url = `https://${_host}/events/#google,load.item.${_encodeValue(encodeURIComponent(c_id))}.${_encodeValue(encodeURIComponent(e_id))}`;
       _addTag(_container, "Tag", true, false, `${_stacked} ${_icon}`, _url, "Edit Tags in Events Web App").innerHTML += `<i style="padding-left: 1px;">${_edit(_data.extendedProperties && _data.extendedProperties.shared ? 10 : 16)}</i>`;
 
     }
@@ -182,6 +196,19 @@ var _start = () => {
 
   } else if (_isCal(_url)) {
 
+    var _check = node => {
+      var _candidates = node.getAttribute("jslog") ? [node] : node.querySelectorAll("[jslog]");
+      if (_candidates) _candidates.forEach(candidate => {
+        var _values = candidate.getAttribute("jslog").split("; ");
+        if (_values && _values.length == 3) {
+          var _value = _values[1].substring(_values[1].indexOf(":") + 1),
+            _event = _value.substring(0, _value.indexOf(",")),
+            _calendar = _value.substring(_value.indexOf(",") + 1);
+          if (_event && _calendar) _cal(_calendar, _event, candidate.closest("div[role='dialog']"));
+        }
+      });
+    };
+
     if (_observer) _observer.disconnect();
     var _config = {
         attributes: false,
@@ -191,24 +218,18 @@ var _start = () => {
       _handle = mutants => mutants.forEach(m => {
         if (m.type == "childList" && m.addedNodes) {
           m.addedNodes.forEach(node => {
-            if (node && node.querySelectorAll) {
-              var _candidates = node.getAttribute("jslog") ? [node] : node.querySelectorAll("[jslog]");
-              if (_candidates) _candidates.forEach(candidate => {
-                var _values = candidate.getAttribute("jslog").split("; ");
-                if (_values && _values.length == 3) {
-                  var _value = _values[1].substring(_values[1].indexOf(":") + 1),
-                    _event = _value.substring(0, _value.indexOf(",")),
-                    _calendar = _value.substring(_value.indexOf(",") + 1);
-                  if (_event && _calendar) _cal(_calendar, _event, candidate.closest("div[role='dialog']"));
-                }
-              });
-            }
+            if (node && node.querySelectorAll) _check(node);
           });
         }
       });
 
     _observer = new MutationObserver(_handle);
     _observer.observe(document.body, _config);
+
+    var _open = document.querySelectorAll("div." + _class);
+    if (_open && _open.length >= 1) {
+      if (_open[0].parentElement) _check(_open[0].parentElement);
+    }
 
   }
 };
