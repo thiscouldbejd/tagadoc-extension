@@ -19,4 +19,4 @@ globals:
   $: false
   jQuery: false
   chrome: false
-  network: true;
+  network: true

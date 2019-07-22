@@ -76,11 +76,11 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
           return (folder.parents && folder.parents.length > 0) ?
             _call(folder.parents[0], _paths) :
             request.team ?
-            _network.request("GET", `${API}/drive/v3/teamdrives/${request.team}`, _token).then(drive => {
-              _paths[0] = `Team | ${drive.name}`;
-              return _paths.join(" -> ");
-            }) :
-            _paths.join(" -> ");
+              _network.request("GET", `${API}/drive/v3/teamdrives/${request.team}`, _token).then(drive => {
+                _paths[0] = `Team | ${drive.name}`;
+                return _paths.join(" -> ");
+              }) :
+              _paths.join(" -> ");
         });
     };
 
@@ -124,51 +124,51 @@ chrome.runtime.onMessageExternal.addListener((request, sender) => {
 
 /* <!-- Set Up Install / Update Handlers --> */
 var _update = manifest => {
-      var _connect = tab => {
-        var _port = chrome.tabs.connect(tab);
-        if (_port) _port.onDisconnect.addListener(
-          (tab => () => setTimeout(() => _connect(tab), 1000 * 1))(tab));
-      };
-      manifest.content_scripts.forEach(inject => {
-        chrome.tabs.query({
-          url: inject.matches
-        }, tabs => tabs.forEach(tab => {
-          if (inject.js) chrome.tabs.sendMessage(tab.id, {
-            "action": "ping"
-          }, null, reply => {
-            if((chrome.runtime.lastError && 
-                chrome.runtime.lastError.message == 
-                	"Could not establish connection. Receiving end does not exist.")) {
-                    inject.js.forEach(script => {
-                      chrome.tabs.executeScript(tab.id, {
-                        file: script
-                      });
-                    });
-            } else if (reply == null) {
-            	_connect(tab.id);
-            }
-          });
-        }));
-      });
-    },
-    _install = manifest => {
-      manifest.content_scripts.forEach(inject => {
-        chrome.tabs.query({
-          url: inject.matches
-        }, tabs => tabs.forEach(tab => {
-          if (inject.js) inject.js.forEach(script => {
-            chrome.tabs.executeScript(tab.id, {
-              file: script
-            });
-          })
-        }));
-      });
-    },
-    _installed = details => {
-      var _manifest = chrome.app.getDetails();
-      if (details && _manifest && _manifest.content_scripts) 
-        	details.reason == "install" ?
-        		_install(_manifest) : details.reason == "update" ?
-        		_update(_manifest) : false;
+    var _connect = tab => {
+      var _port = chrome.tabs.connect(tab);
+      if (_port) _port.onDisconnect.addListener(
+        (tab => () => setTimeout(() => _connect(tab), 1000 * 1))(tab));
     };
+    manifest.content_scripts.forEach(inject => {
+      chrome.tabs.query({
+        url: inject.matches
+      }, tabs => tabs.forEach(tab => {
+        if (inject.js) chrome.tabs.sendMessage(tab.id, {
+          "action": "ping"
+        }, null, reply => {
+          if ((chrome.runtime.lastError &&
+              chrome.runtime.lastError.message ==
+              "Could not establish connection. Receiving end does not exist.")) {
+            inject.js.forEach(script => {
+              chrome.tabs.executeScript(tab.id, {
+                file: script
+              });
+            });
+          } else if (reply == null) {
+            _connect(tab.id);
+          }
+        });
+      }));
+    });
+  },
+  _install = manifest => {
+    manifest.content_scripts.forEach(inject => {
+      chrome.tabs.query({
+        url: inject.matches
+      }, tabs => tabs.forEach(tab => {
+        if (inject.js) inject.js.forEach(script => {
+          chrome.tabs.executeScript(tab.id, {
+            file: script
+          });
+        });
+      }));
+    });
+  },
+  _installed = details => {
+    var _manifest = chrome.app.getDetails();
+    if (details && _manifest && _manifest.content_scripts)
+      details.reason == "install" ?
+        _install(_manifest) : details.reason == "update" ?
+          _update(_manifest) : false;
+  };
 chrome.runtime.onInstalled.addListener(_installed);

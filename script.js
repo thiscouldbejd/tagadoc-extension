@@ -20,47 +20,47 @@ const _locate = size => `<svg xmlns='http://www.w3.org/2000/svg' width='${size ?
 const _getColour = (value, foregroundOnly) => {
   var colour, background;
   switch (value) {
-    case "High":
-      colour = "fff";
-      background = "dc3545";
-      break;
-    case "Medium":
-      colour = "212529";
-      background = "ffc107";
-      break;
-    case "Low":
-      colour = "fff";
-      background = "28a745";
-      break;
-    case "None":
-      colour = "fff";
-      background = "17a2b8";
-      break;
-    case "Review":
-      colour = "fff";
-      background = "343a40";
-      break;
-    case "Reviewed":
-      colour = "212529";
-      background = "f8f9fa";
-      break;
-    case "Highlight":
-      colour = "000";
-      background = "ffff00";
-      break;
-    case "Tag":
-      colour = "fff";
-      background = "000";
-      break;
-    case "Locate":
-      colour = "fff";
-      background = "007bff";
-      break;
-    default:
-      colour = "fff";
-      background = "6c757d";
+  case "High":
+    colour = "fff";
+    background = "dc3545";
+    break;
+  case "Medium":
+    colour = "212529";
+    background = "ffc107";
+    break;
+  case "Low":
+    colour = "fff";
+    background = "28a745";
+    break;
+  case "None":
+    colour = "fff";
+    background = "17a2b8";
+    break;
+  case "Review":
+    colour = "fff";
+    background = "343a40";
+    break;
+  case "Reviewed":
+    colour = "212529";
+    background = "f8f9fa";
+    break;
+  case "Highlight":
+    colour = "000";
+    background = "ffff00";
+    break;
+  case "Tag":
+    colour = "fff";
+    background = "000";
+    break;
+  case "Locate":
+    colour = "fff";
+    background = "007bff";
+    break;
+  default:
+    colour = "fff";
+    background = "6c757d";
   }
-  return foregroundOnly ? `#${colour}`: `color: #${colour}; background-color: #${background};`;
+  return foregroundOnly ? `#${colour}` : `color: #${colour}; background-color: #${background};`;
 };
 const _isCal = url => !!url.match(/:\/\/calendar.google.com/);
 const _isDoc = url => !!url.match(/:\/\/docs.google.com/);
@@ -82,7 +82,7 @@ var _observer;
 /* === Internal Variables === */
 
 /* === Internal Functions === */
-var _w = console.warn;
+var _c = console, _w = _c.warn;
 var _addTag = (container, name, value, css_Class, css_Style, url, title, id) => {
   if (container) {
     var tag = document.createElement(url ? "a" : "div"),
@@ -103,18 +103,18 @@ var _addTag = (container, name, value, css_Class, css_Style, url, title, id) => 
 var _addSearch = (tag, url, title, css_Class, css_Style, colour, size) => {
 
   var search = document.createElement("a"),
-      attributes = _createAttributes(
-        `${_searchClass}${css_Class ? ` ${css_Class}` : ""}`,
-        `${_searchStyle}${css_Style ? ` ${css_Style}` : ""}`,
-        title, "", "Search"
-      );
-    if (url)(attributes.href = url) && (attributes.target = "_blank");
+    attributes = _createAttributes(
+      `${_searchClass}${css_Class ? ` ${css_Class}` : ""}`,
+      `${_searchStyle}${css_Style ? ` ${css_Style}` : ""}`,
+      title, "", "Search"
+    );
+  if (url)(attributes.href = url) && (attributes.target = "_blank");
   Object.keys(attributes).forEach(key => search.setAttribute(key, attributes[key]));
-  
+
   search.innerHTML += _search(size ? size : "0.9em", colour);
   tag.appendChild(search);
   return search;
-  
+
 };
 
 var _clean = (container, css_class) => {
@@ -161,94 +161,94 @@ var _run = fn => {
 };
 
 var _doc = id => _run(() => chrome.runtime.sendMessage({
-      "action": "get-doc-tags",
-      "doc": id
-    }, response => {
+  "action": "get-doc-tags",
+  "doc": id
+}, response => {
 
-      if (!response) return;
-      var _container = document.getElementById("docs-titlebar-container");
-      if (_container) _container = _container.getElementsByClassName("docs-title-outer");
-      if (_container && _container.length > 0)(_container = _container[0]) && _clean(_container, _class);
+  if (!response) return;
+  var _container = document.getElementById("docs-titlebar-container");
+  if (_container) _container = _container.getElementsByClassName("docs-title-outer");
+  if (_container && _container.length > 0)(_container = _container[0]) && _clean(_container, _class);
 
-      if (response.authenticated) {
+  if (response.authenticated) {
 
-        if (response.data) {
+    if (response.data) {
 
-          var _parent = "root";
-          if (response.data.parents && response.data.parents.length > 0) {
+      var _parent = "root";
+      if (response.data.parents && response.data.parents.length > 0) {
 
-            var _team = (response.data.teamDriveId && response.data.parents[0] == response.data.teamDriveId) ? "team." : "",
-              _suffix = (response.data.teamDriveId && response.data.parents[0] != response.data.teamDriveId) ? `.${response.data.teamDriveId}` : "",
-              _url = `https://${_host}/folders/#google,load.${_team}${response.data.parents[0]}${_suffix}`;
+        var _team = (response.data.teamDriveId && response.data.parents[0] == response.data.teamDriveId) ? "team." : "",
+          _suffix = (response.data.teamDriveId && response.data.parents[0] != response.data.teamDriveId) ? `.${response.data.teamDriveId}` : "",
+          _url = `https://${_host}/folders/#google,load.${_team}${response.data.parents[0]}${_suffix}`;
 
-            _addTag(_container, "Locate", true, "goog-inline-block", `${_line} ${_icon}`, _url, "Open Parent in Folders Web App", _parents).innerHTML += `<i style="padding-left: 1px;">${_locate()}</i>`;
+        _addTag(_container, "Locate", true, "goog-inline-block", `${_line} ${_icon}`, _url, "Open Parent in Folders Web App", _parents).innerHTML += `<i style="padding-left: 1px;">${_locate()}</i>`;
 
-            if (response.data.capabilities && response.data.capabilities.canEdit === true) _addTag(_container, "Tag", true, "goog-inline-block", `${_line} ${_icon}`, `${_url}.filter.${response.data.id}`, "Edit Tags in Folders Web App").innerHTML += `<i style="padding-left: 1px;">${_edit()}</i>`;
+        if (response.data.capabilities && response.data.capabilities.canEdit === true) _addTag(_container, "Tag", true, "goog-inline-block", `${_line} ${_icon}`, `${_url}.filter.${response.data.id}`, "Edit Tags in Folders Web App").innerHTML += `<i style="padding-left: 1px;">${_edit()}</i>`;
 
-            chrome.runtime.sendMessage({
-              "action": "get-path",
-              "folders": response.data.parents,
-              "team": response.data.teamDriveId ? response.data.teamDriveId : false
-            });
+        chrome.runtime.sendMessage({
+          "action": "get-path",
+          "folders": response.data.parents,
+          "team": response.data.teamDriveId ? response.data.teamDriveId : false
+        });
 
-            _parent = response.data.parents[0];
-
-          }
-          if (response.data.properties) Object.keys(response.data.properties).forEach(key => {
-            var _value = response.data.properties[key],
-                _tag = _addTag(_container, key, _value, "goog-inline-block", _line),
-                _searchUrl = `https://${_host}/folders/#google,search.properties.${key.replace(/\./g, "%2E")}.${_value.replace(/\./g, "%2E")}.${_parent}`;
-            _addSearch(_tag, _searchUrl, "Find all files with the same Tag/Value", "", "", _getColour((key === "Review" || key === "Reviewed" || key === "Highlight" || key === "Tag" || key === "Locate") ? key : _value, true), "0.9em");
-          });
-
-        }
-
-      } else if (_container) {
-
-        _needsAuth(_container);
+        _parent = response.data.parents[0];
 
       }
+      if (response.data.properties) Object.keys(response.data.properties).forEach(key => {
+        var _value = response.data.properties[key],
+          _tag = _addTag(_container, key, _value, "goog-inline-block", _line),
+          _searchUrl = `https://${_host}/folders/#google,search.properties.${key.replace(/\./g, "%2E")}.${_value.replace(/\./g, "%2E")}.${_parent}`;
+        _addSearch(_tag, _searchUrl, "Find all files with the same Tag/Value", "", "", _getColour((key === "Review" || key === "Reviewed" || key === "Highlight" || key === "Tag" || key === "Locate") ? key : _value, true), "0.9em");
+      });
 
-    }));
+    }
+
+  } else if (_container) {
+
+    _needsAuth(_container);
+
+  }
+
+}));
 
 var _cal = (c_id, e_id, container) => _run(() => chrome.runtime.sendMessage({
-      "action": "get-cal-tags",
-      "calendar": c_id,
-      "event": e_id
-    }, response => {
-      if (!response) return;
+  "action": "get-cal-tags",
+  "calendar": c_id,
+  "event": e_id
+}, response => {
+  if (!response) return;
 
-      if (response.authenticated) {
+  if (response.authenticated) {
 
-        _clean(container, _class);
+    _clean(container, _class);
 
-        if (response.data) {
+    if (response.data) {
 
-          var _data = response.data,
-            _container = document.createElement("div"),
-            _attributes = _createAttributes(`${_class}`, `${_holder}`);
-          Object.keys(_attributes).forEach((key) => _container.setAttribute(key, _attributes[key]));
-          container.appendChild(_container);
+      var _data = response.data,
+        _container = document.createElement("div"),
+        _attributes = _createAttributes(`${_class}`, `${_holder}`);
+      Object.keys(_attributes).forEach((key) => _container.setAttribute(key, _attributes[key]));
+      container.appendChild(_container);
 
-          if (_data.extendedProperties && _data.extendedProperties.shared) Object.keys(_data.extendedProperties.shared).forEach(key => {
-            var _value = _data.extendedProperties.shared[key],
-                _tag = _addTag(_container, key, _value, false, _stacked),
-                _searchUrl = `https://${_host}/events/#google,search.properties.${key.replace(/\./g, "%2E")}.${_value.replace(/\./g, "%2E")}.${c_id.replace(/\./g, "%2E")}`;
-            _addSearch(_tag, _searchUrl, "Find all events with the same Tag/Value", "", "", _getColour((key === "Review" || key === "Reviewed" || key === "Highlight" || key === "Tag" || key === "Locate") ? key : _value, true), "1em");
-          });
+      if (_data.extendedProperties && _data.extendedProperties.shared) Object.keys(_data.extendedProperties.shared).forEach(key => {
+        var _value = _data.extendedProperties.shared[key],
+          _tag = _addTag(_container, key, _value, false, _stacked),
+          _searchUrl = `https://${_host}/events/#google,search.properties.${key.replace(/\./g, "%2E")}.${_value.replace(/\./g, "%2E")}.${c_id.replace(/\./g, "%2E")}`;
+        _addSearch(_tag, _searchUrl, "Find all events with the same Tag/Value", "", "", _getColour((key === "Review" || key === "Reviewed" || key === "Highlight" || key === "Tag" || key === "Locate") ? key : _value, true), "1em");
+      });
 
-          var _url = `https://${_host}/events/#google,load.item.${_encodeValue(encodeURIComponent(c_id))}.${_encodeValue(encodeURIComponent(e_id))}`;
-          _addTag(_container, "Tag", true, false, `${_stacked} ${_icon}`, _url, "Edit Tags in Events Web App").innerHTML += `<i style="padding-left: 1px;">${_edit(_data.extendedProperties && _data.extendedProperties.shared ? 10 : 16)}</i>`;
+      var _url = `https://${_host}/events/#google,load.item.${_encodeValue(encodeURIComponent(c_id))}.${_encodeValue(encodeURIComponent(e_id))}`;
+      _addTag(_container, "Tag", true, false, `${_stacked} ${_icon}`, _url, "Edit Tags in Events Web App").innerHTML += `<i style="padding-left: 1px;">${_edit(_data.extendedProperties && _data.extendedProperties.shared ? 10 : 16)}</i>`;
 
-        }
+    }
 
-      } else {
+  } else {
 
-        _needsAuth(container);
+    _needsAuth(container);
 
-      }
+  }
 
-    }));
+}));
 
 var _start = () => {
   var _url = window.location.href;
@@ -264,24 +264,25 @@ var _start = () => {
       if (_candidates) _candidates.forEach(candidate => {
         var _values = candidate.getAttribute("jslog").split("; ");
         if (_values && _values.length == 3) {
-          var _value = _values[1].substring(_values[1].indexOf(":") + 1), _event, _calendar;
-          	if (_value.indexOf("[") === 0) {
-              try {
-                _value = JSON.parse(_value);
-                if (_value && _value.length >= 2) {
-                  _event = _value[0];
-                  _calendar = _value[1];
-                }
-              } catch (e) {
-                _event = _value.substring(2, _value.indexOf(",") - 1);
-            		_calendar = _value.substring(_value.indexOf(",") + 2);
-                _calendar = _calendar.substring(0, _calendar.indexOf(",") - 1);
-            	}
-            } else {
-              _event = _value.substring(0, _value.indexOf(","));
-            	_calendar = _value.substring(_value.indexOf(",") + 1);
+          var _value = _values[1].substring(_values[1].indexOf(":") + 1),
+            _event, _calendar;
+          if (_value.indexOf("[") === 0) {
+            try {
+              _value = JSON.parse(_value);
+              if (_value && _value.length >= 2) {
+                _event = _value[0];
+                _calendar = _value[1];
+              }
+            } catch (e) {
+              _event = _value.substring(2, _value.indexOf(",") - 1);
+              _calendar = _value.substring(_value.indexOf(",") + 2);
+              _calendar = _calendar.substring(0, _calendar.indexOf(",") - 1);
             }
-            
+          } else {
+            _event = _value.substring(0, _value.indexOf(","));
+            _calendar = _value.substring(_value.indexOf(",") + 1);
+          }
+
           if (_event && _calendar) _cal(_calendar, _event, candidate.closest("div[role='dialog']"));
         }
       });
@@ -339,7 +340,9 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
     var _path = document.getElementById(_parents);
     if (_path && request.paths) _path.title = request.paths.join(String.fromCharCode(10));
   } else if (request.action == "ping") {
-    sendResponse({reply: "pong"});
+    sendResponse({
+      reply: "pong"
+    });
   }
 });
 

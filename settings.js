@@ -1,6 +1,6 @@
 $(function() {
 
-  var _network = network(), _e = console.error, _l = console.log;
+  var _network = network(), _c = console, _e = _c.error, _l = _c.log;
 
   var _err = e => _e(JSON.stringify(e));
 
