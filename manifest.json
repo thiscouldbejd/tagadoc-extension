@@ -1,10 +1,11 @@
 {
   "manifest_version": 2,
   "minimum_chrome_version": "45",
-  "name": "Tag-a-Doc",
-  "short_name": "TagaDoc",
-  "description": "Easily keep track of projects, review dates, confidentiality levels or metadata. Displays document/calendar tags in G-Suite Apps",
-  "version": "1.2.0",
+  "name" : "__MSG_extensionName__",
+	"short_name" : "__MSG_extensionShortName__",
+	"description" : "__MSG_extensionDescription__",
+  "default_locale" : "en",
+  "version": "1.2.7",
   "icons": {
     "16": "icon16.png",
     "48": "icon48.png",
@@ -13,10 +14,18 @@
   "oauth2": {
     "client_id":"506651158922-v3fudugveucmkcgu0ncm6rnrqmo7md45.apps.googleusercontent.com",
     "scopes": [
-      "profile", "https://www.googleapis.com/auth/drive.readonly", "https://www.googleapis.com/auth/calendar.readonly"
+      "profile",
+      "https://www.googleapis.com/auth/drive.readonly",
+      "https://www.googleapis.com/auth/calendar.events.readonly"
     ]
   },
-  "permissions": ["identity", "tabs", "https://docs.google.com/*", "https://calendar.google.com/*", "https://www.googleapis.com/*"],
+  "permissions": [
+    "identity",
+    "tabs",
+    "https://docs.google.com/*",
+    "https://calendar.google.com/*",
+    "https://www.googleapis.com/*"
+  ],
   "content_scripts": [
       {
     "matches": [

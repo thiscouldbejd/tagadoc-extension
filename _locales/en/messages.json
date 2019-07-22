@@ -1,0 +1,14 @@
+{
+  "extensionName": {
+    "message": "Tag-a-Doc",
+    "description": "Extension name."
+  },
+  "extensionShortName": {
+    "message": "TagaDoc",
+    "description": "Extension short-name."
+  },
+  "extensionDescription": {
+    "message": "Easily keep track of projects, review dates, confidentiality levels or metadata. Displays document/calendar tags in G-Suite Apps",
+    "description": "Extension description."
+  }
+}

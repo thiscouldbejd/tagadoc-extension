@@ -1,10 +1,10 @@
 $(function() {
 
-  var _network = network();
+  var _network = network(), _e = console.error, _l = console.log;
 
-  var _err = e => console.error(JSON.stringify(e));
+  var _err = e => _e(JSON.stringify(e));
 
-  var _log = (m, d) => (d ? console.log(m, d) : console.log(m)) || true;
+  var _log = (m, d) => (d ? _l(m, d) : _l(m)) || true;
 
   var _busy = (e, t) => e ? t ? $(e).prepend("<div class='loader'><div class='loading'><div class='spinner'></div></div></div>") && $(e).toggleClass("disabled", true) : $(e).find(".loader").remove() && $(e).toggleClass("disabled", false) : false;
 
@@ -71,7 +71,7 @@ $(function() {
       value: token
     }))
     .then(_getUser).then(_handleUser).catch(e => {
-      e.message == "OAuth2 not granted or revoked." ? _signOut(true) : _reconcile(false, {
+      e.message == "OAuth2 not granted or revoked." || e.status == 401 ? _signOut(true) : _reconcile(false, {
         error: e
       });
     });
